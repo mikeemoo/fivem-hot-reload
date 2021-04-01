@@ -9,3 +9,6 @@ The file locations are extracted from the fxmanifest.lua files of each resource.
 * `unwatch <resourceName>` Stop watching a resource
 * `unwatch all` Stop watching all resources
 * `watching` List all of the resources currently being watched.
+
+
+Requires `add_ace resource.mm-hot-reload command.stop allow` and `add_ace resource.mm-hot-reload command.start allow` in server config.

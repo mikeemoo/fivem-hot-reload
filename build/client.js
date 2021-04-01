@@ -1,0 +1,1 @@
+onNet("hot-reload:report",console.log),RegisterCommand("watch",((t,[e])=>emitNet("hot-reload:watch",e)),!0),RegisterCommand("unwatch",((t,[e])=>emitNet("hot-reload:unwatch",e)),!0),RegisterCommand("watching",(t=>emitNet("hot-reload:list")),!0);

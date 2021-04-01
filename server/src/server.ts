@@ -139,7 +139,9 @@ const unwatchResource = (source: string, resourceName: string) => {
     report(source, `Not watching ${resourceName}`);
     return;
   }
-  //watchers[resourceName].close();
+  if (watchers[resourceName].watcher) {
+    watchers[resourceName].watcher.close();
+  }
   delete watchers[resourceName];
   report(source, `Stopped watching ${resourceName}`);
 };

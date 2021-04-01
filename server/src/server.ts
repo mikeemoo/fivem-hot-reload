@@ -111,7 +111,7 @@ const watchResource = async (source: string, resourceName: string) => {
   let lastRestart = Date.now();
 
   watchers[resourceName].watcher = chokidar
-    .watch(resourceFiles, {
+    .watch(resourceFiles.filter((item, i, self) => self.indexOf(item) === i), {
       persistent: true,
       cwd: resourcePath,
       awaitWriteFinish: {
@@ -122,7 +122,7 @@ const watchResource = async (source: string, resourceName: string) => {
     .on("all", () => {
       setImmediate(() => {
         const now = Date.now();
-        if (now > lastRestart + 800) {
+        if (now > lastRestart + 1000) {
           if (GetResourceState(resourceName) === "started") {
             ExecuteCommand(`restart ${resourceName}`);
           }

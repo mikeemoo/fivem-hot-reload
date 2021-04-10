@@ -94,13 +94,13 @@ const watchResource = async (source: string, resourceName: string) => {
             const expressionArgs = statement.expression.arguments;
             expressionArgs.fields.forEach((field) => {
               if (field.value.type === "StringLiteral") {
-                resourceFiles.push(field.value.raw.replace(/^'|'$/g, ""));
+                resourceFiles.push(field.value.raw.replace(/^('|")|('|")$/g, ""));
               }
             });
           } else if (statement.expression.type === "StringCallExpression") {
             const expressionArg = statement.expression.argument;
             if (expressionArg.type === "StringLiteral") {
-              resourceFiles.push(expressionArg.raw.replace(/^'|'$/g, ""));
+              resourceFiles.push(expressionArg.raw.replace(/^('|")|('|")$/g, ""));
             }
           }
         }

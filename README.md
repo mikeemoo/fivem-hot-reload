@@ -5,9 +5,9 @@ The file locations are extracted from the fxmanifest.lua files of each resource.
 
 ## Commands
 
-- `watch <resourceName>` Start watching a resource
+- `watch <resource1> <resource2>  <resource2>` Start watching resources
 - `watch all` Start watching all resources
-- `unwatch <resourceName>` Stop watching a resource
+- `unwatch <resource1> <resource2> <resource3>` Stop watching resources
 - `unwatch all` Stop watching all resources
 - `watching` List all of the resources currently being watched.
 

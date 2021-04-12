@@ -82,6 +82,9 @@ const watchResource = async (source: string, resourceName: string) => {
   const resourceFiles: string[] = [];
   const parsedManifest = parse(manifestData);
 
+  const removeWrappingQuotes = (str: string) =>
+    str.replace(/^('|")|('|")$/g, "");
+
   parsedManifest.body.forEach((statement) => {
     if (statement.type === "CallStatement") {
       const base = statement.expression.base;
@@ -94,13 +97,13 @@ const watchResource = async (source: string, resourceName: string) => {
             const expressionArgs = statement.expression.arguments;
             expressionArgs.fields.forEach((field) => {
               if (field.value.type === "StringLiteral") {
-                resourceFiles.push(field.value.raw.replace(/^('|")|('|")$/g, ""));
+                resourceFiles.push(removeWrappingQuotes(field.value.raw));
               }
             });
           } else if (statement.expression.type === "StringCallExpression") {
             const expressionArg = statement.expression.argument;
             if (expressionArg.type === "StringLiteral") {
-              resourceFiles.push(expressionArg.raw.replace(/^('|")|('|")$/g, ""));
+              resourceFiles.push(removeWrappingQuotes(expressionArg.raw));
             }
           }
         }
@@ -111,14 +114,17 @@ const watchResource = async (source: string, resourceName: string) => {
   let lastRestart = Date.now();
 
   watchers[resourceName].watcher = chokidar
-    .watch(resourceFiles.filter((item, i, self) => self.indexOf(item) === i), {
-      persistent: true,
-      cwd: resourcePath,
-      awaitWriteFinish: {
-        stabilityThreshold: 500,
-        pollInterval: 100,
-      },
-    })
+    .watch(
+      resourceFiles.filter((item, i, self) => self.indexOf(item) === i),
+      {
+        persistent: true,
+        cwd: resourcePath,
+        awaitWriteFinish: {
+          stabilityThreshold: 500,
+          pollInterval: 100,
+        },
+      }
+    )
     .on("all", () => {
       setImmediate(() => {
         const now = Date.now();
@@ -146,20 +152,22 @@ const unwatchResource = (source: string, resourceName: string) => {
   report(source, `Stopped watching ${resourceName}`);
 };
 
-onNet("hot-reload:watch", (resourceName: string) => {
-  if (resourceName === "all") {
+onNet("hot-reload:watch", (...resourceNames: string[]) => {
+  if (resourceNames[0] === "all") {
     getAllResources().forEach((resource) => watchResource(source, resource));
     return;
   }
-  watchResource(source, resourceName);
+  resourceNames.forEach((resourceName) => watchResource(source, resourceName));
 });
 
-onNet("hot-reload:unwatch", (resourceName: string) => {
-  if (resourceName === "all") {
+onNet("hot-reload:unwatch", (...resourceNames: string[]) => {
+  if (resourceNames[0] === "all") {
     getAllResources().forEach((resource) => unwatchResource(source, resource));
     return;
   }
-  unwatchResource(source, resourceName);
+  resourceNames.forEach((resourceName) =>
+    unwatchResource(source, resourceName)
+  );
 });
 
 onNet("hot-reload:list", () => {
